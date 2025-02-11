@@ -70,13 +70,17 @@ function Merge-With-Movement {
         Get-Repo -repoUrl $mergeUrl -repoName $mergeName
         Move-Folders -sourceRepo $mergeName -targetRepo $repoName -folders $folders -placement $placement
         
-        git add -A
+        git add -A --verbose
         git commit -m "Moved $mergeName contents into $repoName"
         Remove-Item -Recurse -Force $mergeName
     }
     
     Write-Host "Pushing changes..."
     git push origin main
+    git status
+    git log --oneline --graph --decorate -n 5
+    Write-Host "Push to origin main completed successfully."
+    
     
     Set-Location ..
     Write-Host "Merge process for $sourceRepo completed."
