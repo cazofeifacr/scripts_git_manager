@@ -27,17 +27,24 @@ function Move-Folders {
     param (
         [string]$sourceRepo, 
         [string]$targetRepo,
-        [array]$folders
+        [array]$folders,
+        [string]$placement
     )
     
     foreach ($folder in $folders) {
         $sourcePath = "$sourceRepo/$folder"
-        $targetPath = "$targetRepo/$sourceRepo/$folder"
+        
+        if ($placement -eq "nested") {
+            $targetPath = "$targetRepo/$sourceRepo/$folder"
+        }
+        else {
+            $targetPath = "$targetRepo/$folder"
+        }
         
         New-Item -ItemType Directory -Path $targetPath -Force
         
         git mv $sourcePath $targetPath
-        Write-Host "Moved $folder from $sourceRepo to $targetRepo/$sourceRepo/"
+        Write-Host "Moved $folder from $sourceRepo to $targetPath"
     }
 }
 
@@ -46,7 +53,8 @@ function Merge-With-Movement {
         [string]$gitlabServer, 
         [string]$sourceRepo, 
         [array]$mergeRepos,
-        [array]$folders
+        [array]$folders,
+        [string]$placement
     )
     
     $sourceUrl = "$gitlabServer/$sourceRepo.git"
@@ -60,7 +68,7 @@ function Merge-With-Movement {
         $mergeName = $mergeRepo.Split("/")[-1]
         
         Get-Repo -repoUrl $mergeUrl -repoName $mergeName
-        Move-Folders -sourceRepo $mergeName -targetRepo $repoName -folders $folders
+        Move-Folders -sourceRepo $mergeName -targetRepo $repoName -folders $folders -placement $placement
         
         git add -A
         git commit -m "Moved $mergeName contents into $repoName"
@@ -76,7 +84,8 @@ function Merge-With-Movement {
 
 $gitlabServer = $config.gitlab_server.TrimEnd("/")
 $foldersToMove = @("src", "test")  # Modify this list as needed or pass via script parameter
+$placementOption = "nested" # Change to "flat" for option 2
 
 foreach ($repo in $config.repos) {
-    Merge-With-Movement -gitlabServer $gitlabServer -sourceRepo $repo.source -mergeRepos $repo."merge-with" -folders $foldersToMove
+    Merge-With-Movement -gitlabServer $gitlabServer -sourceRepo $repo.source -mergeRepos $repo."merge-with" -folders $foldersToMove -placement $placementOption
 }
