@@ -1,0 +1,13 @@
+{
+  "gitlab_server": "https://gitlab.com",
+  "repos": [
+    {
+      "source": "new-user/new-repo",
+      "merge-with": ["new-user/new-A", "new-user/new-B", "new-user/new-C"]
+    },
+    {
+      "source": "new-user/new-another-repo",
+      "merge-with": ["new-user/new-X", "new-user/new-Y"]
+    }
+  ]
+}
