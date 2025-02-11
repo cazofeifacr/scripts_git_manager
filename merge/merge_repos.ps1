@@ -43,7 +43,7 @@ function Move-Folders {
         
         New-Item -ItemType Directory -Path $targetPath -Force
         
-        git mv $sourcePath $targetPath
+        git mv -v $sourcePath $targetPath
         Write-Host "Moved $folder from $sourceRepo to $targetPath"
     }
 }
